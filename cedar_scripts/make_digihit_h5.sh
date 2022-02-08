@@ -12,6 +12,7 @@ ulimit -c 0
 
 source /project/rpp-blairt2k/machine_learning/production_software/DataTools/cedar_scripts/sourceme.sh
 
+SLURM_TMPDIR="${SLURM_TMPDIR:-/scratch/$USER}"
 virtualenv --no-download $SLURM_TMPDIR/env
 source $SLURM_TMPDIR/env/bin/activate
 pip install --no-index --upgrade pip
