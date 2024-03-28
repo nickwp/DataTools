@@ -103,7 +103,7 @@ class WCSim:
                 "energy": sum(p.GetE() for p in particles)
             }
 
-        # Workaround for opticalphoton shotgun sim (Ka Ming's)
+        # Workaround for opticalphoton sim
         opticalphotons = [t for t in tracks if t.GetFlag() == -2]  # Flag==-1 doesn't have proper position
         if len(opticalphotons) == 1 and opticalphotons[0].GetIpnu() == 0:
             position = [opticalphotons[0].GetStop(i) for i in range(3)] 
@@ -113,7 +113,6 @@ class WCSim:
             direction = [opticalphotons[0].GetDir(i) for i in range(3)]
             energy = opticalphotons[0].GetE()
             
-            #print(position, direction, energy)
             return {
                 "pid": -22,
                 "position": position,
