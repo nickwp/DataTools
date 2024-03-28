@@ -102,6 +102,25 @@ class WCSim:
                 "direction": [p / norm for p in momentum],
                 "energy": sum(p.GetE() for p in particles)
             }
+
+        # Workaround for opticalphoton shotgun sim (Ka Ming's)
+        opticalphotons = [t for t in tracks if t.GetFlag() == -2]  # Flag==-1 doesn't have proper position
+        if len(opticalphotons) == 1 and opticalphotons[0].GetIpnu() == 0:
+            position = [opticalphotons[0].GetStop(i) for i in range(3)] 
+            
+        opticalphotons = [t for t in tracks if t.GetFlag() == -1]     
+        if len(opticalphotons) == 1 and opticalphotons[0].GetIpnu() == 0:
+            direction = [opticalphotons[0].GetDir(i) for i in range(3)]
+            energy = opticalphotons[0].GetE()
+            
+            #print(position, direction, energy)
+            return {
+                "pid": -22,
+                "position": position,
+                "direction": direction,
+                "energy": energy
+            }
+            
         # Otherwise something else is going on... guess info from the primaries
         momentum = [sum(p.GetDir(i) * p.GetP() for p in particles) for i in range(3)]
         norm = np.sqrt(sum(p ** 2 for p in momentum))

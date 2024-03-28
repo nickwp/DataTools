@@ -43,7 +43,7 @@ if __name__ == '__main__':
         print(input_file, flush=True)
         if not os.path.isfile(input_file):
             raise ValueError(input_file+" does not exist")
-        npz_file = np.load(input_file)
+        npz_file = np.load(input_file, allow_pickle=True)
         trigger_times = npz_file['trigger_time']
         trigger_types = npz_file['trigger_type']
         hit_triggers = npz_file['digi_hit_trigger']
