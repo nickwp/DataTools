@@ -57,6 +57,7 @@ def dump_file(infile, outfile):
     track_energy = np.empty(nevents, dtype=object)
     track_start_position = np.empty(nevents, dtype=object)
     track_stop_position = np.empty(nevents, dtype=object)
+    track_dir = np.empty(nevents, dtype=object)
     track_parent = np.empty(nevents, dtype=object)
     track_flag = np.empty(nevents, dtype=object)
 
@@ -95,6 +96,7 @@ def dump_file(infile, outfile):
         track_energy[ev] = tracks["energy"]
         track_start_position[ev] = tracks["start_position"]
         track_stop_position[ev] = tracks["stop_position"]
+        track_dir[ev] = tracks["dir"]
         track_parent[ev] = tracks["parent"]
         track_flag[ev] = tracks["flag"]
 
@@ -130,6 +132,7 @@ def dump_file(infile, outfile):
                         track_energy=track_energy,
                         track_start_position=track_start_position,
                         track_stop_position=track_stop_position,
+                        track_dir=track_dir,
                         track_parent=track_parent,
                         track_flag=track_flag,
                         trigger_time=trigger_time,
