@@ -39,7 +39,7 @@ def geodump(input_file, output_file):
 
 if __name__ == '__main__':
 
-    ROOT.gSystem.Load(os.environ['WCSIMDIR'] + "/libWCSimRoot.so")
+    #ROOT.gSystem.Load(os.environ['WCSIMDIR'] + "/libWCSimRoot.so")
     config = get_args()
 
     if os.path.splitext(config.input_file)[1].lower() != '.root':
