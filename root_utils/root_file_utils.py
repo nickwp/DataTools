@@ -167,6 +167,8 @@ class WCSim:
     def get_hit_photons(self):
         start_position = []
         end_position = []
+        start_dir = []
+        end_dir = []
         start_time = []
         end_time = []
         track = []
@@ -184,6 +186,8 @@ class WCSim:
             start_time.append(np.zeros(n_photons, dtype=np.float32))
             start_position.append(np.zeros((n_photons, 3), dtype=np.float32))
             end_position.append(np.zeros((n_photons, 3), dtype=np.float32))
+            start_dir.append(np.zeros((n_photons, 3), dtype=np.float32))
+            end_dir.append(np.zeros((n_photons, 3), dtype=np.float32))
             photons = self.trigger.GetCherenkovHitTimes()
             end_time[t][:] = [p.GetTruetime() for p in photons]
             track[t][:] = [p.GetParentID() for p in photons]
@@ -192,11 +196,15 @@ class WCSim:
                 for i in range(3):
                     start_position[t][:,i] = [p.GetPhotonStartPos(i)/10 for p in photons]
                     end_position[t][:,i] = [p.GetPhotonEndPos(i)/10 for p in photons]
+                    start_dir[t][:,i] = [p.GetPhotonStartDir(i) for p in photons]
+                    end_dir[t][:,i] = [p.GetPhotonEndDir(i) for p in photons]
             except AttributeError: # leave as zeros if not using tracking branch
                 pass
         photons = {
             "start_position": np.concatenate(start_position),
             "end_position": np.concatenate(end_position),
+            "start_dir": np.concatenate(start_dir),
+            "end_dir": np.concatenate(end_dir),
             "start_time": np.concatenate(start_time),
             "end_time": np.concatenate(end_time),
             "track": np.concatenate(track),

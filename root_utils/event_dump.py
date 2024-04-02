@@ -45,8 +45,10 @@ def dump_file(infile, outfile):
     true_hit_pmt = np.empty(nevents, dtype=object)
     true_hit_time = np.empty(nevents, dtype=object)
     true_hit_pos = np.empty(nevents, dtype=object)
+    true_hit_dir = np.empty(nevents, dtype=object)
     true_hit_start_time = np.empty(nevents, dtype=object)
     true_hit_start_pos = np.empty(nevents, dtype=object)
+    true_hit_start_dir = np.empty(nevents, dtype=object)
     true_hit_parent = np.empty(nevents, dtype=object)
 
     track_id = np.empty(nevents, dtype=object)
@@ -74,8 +76,10 @@ def dump_file(infile, outfile):
         true_hit_pmt[ev] = true_hits["pmt"]
         true_hit_time[ev] = true_hits["end_time"]
         true_hit_pos[ev] = true_hits["end_position"]
+        true_hit_dir[ev] = true_hits["end_dir"]
         true_hit_start_time[ev] = true_hits["start_time"]
         true_hit_start_pos[ev] = true_hits["start_position"]
+        true_hit_start_dir[ev] = true_hits["start_dir"]
         true_hit_parent[ev] = true_hits["track"]
 
         digi_hits = wcsim.get_digitized_hits()
@@ -115,8 +119,10 @@ def dump_file(infile, outfile):
                         true_hit_pmt=true_hit_pmt,
                         true_hit_time=true_hit_time,
                         true_hit_pos=true_hit_pos,
+                        true_hit_dir=true_hit_dir,
                         true_hit_start_time=true_hit_start_time,
                         true_hit_start_pos=true_hit_start_pos,
+                        true_hit_start_dir=true_hit_start_dir,
                         true_hit_parent=true_hit_parent,
                         track_id=track_id,
                         track_pid=track_pid,
