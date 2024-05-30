@@ -93,6 +93,10 @@ def dump_file(infile, outfile):
         track_stop_position[ev] = tracks["stop_position"]
         track_parent[ev] = tracks["parent"]
         track_flag[ev] = tracks["flag"]
+        track_boundary_points = tracks["boundary_points"]
+        track_boundary_times = tracks["boundary_times"]
+        track_boundary_kes = tracks["boundary_kes"]
+        track_boundary_types = tracks["boundary_types"]
 
         triggers = wcsim.get_triggers()
         trigger_time[ev] = triggers["time"]
@@ -100,6 +104,8 @@ def dump_file(infile, outfile):
 
         event_id[ev] = ev
         root_file[ev] = infile
+
+        print(ev)
 
     np.savez_compressed(outfile,
                         event_id=event_id,
@@ -126,6 +132,10 @@ def dump_file(infile, outfile):
                         track_stop_position=track_stop_position,
                         track_parent=track_parent,
                         track_flag=track_flag,
+                        track_boundary_points=track_boundary_points,
+                        track_boundary_times=track_boundary_times,
+                        track_boundary_kes=track_boundary_kes,
+                        track_boundary_types=track_boundary_types,
                         trigger_time=trigger_time,
                         trigger_type=trigger_type
                         )
