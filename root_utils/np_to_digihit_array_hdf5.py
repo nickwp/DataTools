@@ -14,6 +14,7 @@ def get_args():
     parser.add_argument('-o', '--output_file', type=str)
     parser.add_argument('-H', '--half-height', type=float, default=300)
     parser.add_argument('-R', '--radius', type=float, default=400)
+    parser.add_argument('-m', '--max-hit-time', type=float, default=100)
     args = parser.parse_args()
     return args
 
@@ -48,14 +49,15 @@ if __name__ == '__main__':
         trigger_times = npz_file['trigger_time']
         trigger_types = npz_file['trigger_type']
         hit_triggers = npz_file['digi_hit_trigger']
+        hit_times = npz_file['digi_hit_time']
         total_rows += hit_triggers.shape[0]
         event_triggers = np.full(hit_triggers.shape[0], np.nan)
-        for i, (times, types, hit_trigs) in enumerate(zip(trigger_times, trigger_types, hit_triggers)):
-            good_triggers = np.where(types == 0)[0]
+        for i, (times, types, hit_trigs, hit_times) in enumerate(zip(trigger_times, trigger_types, hit_triggers, hit_times)):
+            good_triggers = np.where((types == 0) | (types == 3))[0]
             if len(good_triggers) == 0:
                 continue
             first_trigger = good_triggers[np.argmin(times[good_triggers])]
-            nhits = np.count_nonzero(hit_trigs == first_trigger)
+            nhits = np.count_nonzero((hit_trigs == first_trigger) & (hit_times < config.max_hit_time))
             total_hits += nhits
             if nhits >= min_hits:
                 event_triggers[i] = first_trigger
@@ -172,11 +174,12 @@ if __name__ == '__main__':
 
         for i, (trigs, times, charges, pmts) in enumerate(zip(hit_triggers, hit_times, hit_charges, hit_pmts)):
             dset_event_hit_index[offset+i] = hit_offset
-            hit_indices = np.where(trigs == event_triggers[i])[0]
-            hit_offset_next += len(hit_indices)
-            dset_hit_time[hit_offset:hit_offset_next] = times[hit_indices]
-            dset_hit_charge[hit_offset:hit_offset_next] = charges[hit_indices]
-            dset_hit_pmt[hit_offset:hit_offset_next] = pmts[hit_indices]
+            hit_indices = np.where((trigs == event_triggers[i]) & (times<config.max_hit_time))[0]
+            if len(hit_indices) > 0:
+                hit_offset_next += len(hit_indices)
+                dset_hit_time[hit_offset:hit_offset_next] = times[hit_indices] - np.min(times[hit_indices])
+                dset_hit_charge[hit_offset:hit_offset_next] = charges[hit_indices]
+                dset_hit_pmt[hit_offset:hit_offset_next] = pmts[hit_indices]
             hit_offset = hit_offset_next
 
         offset = offset_next
