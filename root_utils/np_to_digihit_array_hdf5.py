@@ -5,6 +5,7 @@ import subprocess
 from datetime import datetime
 import argparse
 import h5py
+import warnings
 
 
 def get_args():
@@ -25,8 +26,8 @@ if __name__ == '__main__':
     script_path = os.path.dirname(os.path.abspath(__file__))
     git_status = subprocess.check_output(['git', '-C', script_path, 'status', '--porcelain', '--untracked-files=no']).decode()
     if git_status:
-        raise Exception("Directory of this script ({}) is not a clean git directory:\n{}Need a clean git directory for storing script version in output file.".format(script_path, git_status))
-    git_describe = subprocess.check_output(['git', '-C', script_path, 'describe', '--always', '--long', '--tags']).decode().strip()
+        warnings.warn("Directory of this script ({}) is not a clean git directory:\n{}Need a clean git directory for storing script version in output file.".format(script_path, git_status))
+    git_describe = subprocess.check_output(['git', '-C', script_path, 'describe', '--always', '--long', '--tags', '--dirty']).decode().strip()
     print("git describe for path to this script ({}):".format(script_path), git_describe)
     f.attrs['git-describe'] = git_describe
     f.attrs['command'] = str(sys.argv)
@@ -43,7 +44,7 @@ if __name__ == '__main__':
         print(input_file, flush=True)
         if not os.path.isfile(input_file):
             raise ValueError(input_file+" does not exist")
-        npz_file = np.load(input_file)
+        npz_file = np.load(input_file, allow_pickle=True)
         trigger_times = npz_file['trigger_time']
         trigger_types = npz_file['trigger_type']
         hit_triggers = npz_file['digi_hit_trigger']
@@ -95,6 +96,9 @@ if __name__ == '__main__':
     dset_angles = f.create_dataset("angles",
                                    shape=(total_rows, 2),
                                    dtype=np.float32)
+    dset_fully_contained = f.create_dataset("fully_contained",
+                                            shape=(total_rows,),
+                                            dtype=np.bool_)
     dset_veto = f.create_dataset("veto",
                                  shape=(total_rows,),
                                  dtype=np.bool_)
@@ -126,6 +130,8 @@ if __name__ == '__main__':
         track_energy = npz_file['track_energy']
         track_stop_position = npz_file['track_stop_position']
         track_start_position = npz_file['track_start_position']
+        boundary_kes= npz_file['track_boundary_kes']
+        boundary_types= npz_file['track_boundary_types']
 
         offset_next += event_ids.shape[0]
 
@@ -143,19 +149,26 @@ if __name__ == '__main__':
         azimuths = np.arctan2(directions[:, 2], directions[:, 0])
         dset_angles[offset:offset_next, :] = np.hstack((polars.reshape(-1, 1), azimuths.reshape(-1, 1)))
 
-        for i, (pids, energies, starts, stops) in enumerate(zip(track_pid, track_energy, track_start_position, track_stop_position)):
-            muons_above_threshold = (np.abs(pids) == 13) & (energies > 166)
-            electrons_above_threshold = (np.abs(pids) == 11) & (energies > 2)
-            gammas_above_threshold = (np.abs(pids) == 22) & (energies > 2)
+        for i, (pids, energies, starts, stops, kes, types) in enumerate(zip(track_pid, track_energy, track_start_position, track_stop_position, boundary_kes, boundary_types)):
+            muon_tracks = np.abs(pids) == 13
+            electron_tracks = np.abs(pids) == 11
+            gamma_tracks = np.abs(pids) == 22
+            muons_above_threshold = muon_tracks & (energies > 166)
+            electrons_above_threshold = electron_tracks & (energies > 2)
+            gammas_above_threshold = gamma_tracks & (energies > 2)
             above_threshold = muons_above_threshold | electrons_above_threshold | gammas_above_threshold
             outside_tank = (np.linalg.norm(stops[:, (0, 2)], axis=1) > config.radius) | (np.abs(stops[:, 1]) > config.half_height)
             dset_veto[offset+i] = np.any(above_threshold & outside_tank)
             end_energy_estimate = energies - np.linalg.norm(stops - starts, axis=1)*2
-            muons_above_threshold = (np.abs(pids) == 13) & (end_energy_estimate > 166)
-            electrons_above_threshold = (np.abs(pids) == 11) & (end_energy_estimate > 2)
-            gammas_above_threshold = (np.abs(pids) == 22) & (end_energy_estimate > 2)
+            muons_above_threshold = muon_tracks & (end_energy_estimate > 166)
+            electrons_above_threshold = electron_tracks & (end_energy_estimate > 2)
+            gammas_above_threshold = gamma_tracks & (end_energy_estimate > 2)
             above_threshold = muons_above_threshold | electrons_above_threshold | gammas_above_threshold
             dset_veto2[offset+i] = np.any(above_threshold & outside_tank)
+            muons_exit_above_threshold = [np.any((t == 1) & (k > 166)) for t, k in zip(types[muon_tracks], kes[muon_tracks])]
+            electrons_exit_above_threshold = [np.any((t == 1) & (k > 2)) for t, k in zip(types[electron_tracks], kes[electron_tracks])]
+            gammas_exit_above_threshold = [np.any((t == 1) & (k > 2)) for t, k in zip(types[gamma_tracks], kes[gamma_tracks])]
+            dset_fully_contained[offset+i] = not (np.any(muons_exit_above_threshold) or np.any(electrons_exit_above_threshold) or np.any(gammas_exit_above_threshold))
 
         for i, (trigs, times, charges, pmts) in enumerate(zip(hit_triggers, hit_times, hit_charges, hit_pmts)):
             dset_event_hit_index[offset+i] = hit_offset
