@@ -189,17 +189,19 @@ class WCSim:
             start_dir.append(np.zeros((n_photons, 3), dtype=np.float32))
             end_dir.append(np.zeros((n_photons, 3), dtype=np.float32))
             photons = self.trigger.GetCherenkovHitTimes()
-            end_time[t][:] = [p.GetTruetime() for p in photons]
-            track[t][:] = [p.GetParentID() for p in photons]
-            try:  # Only works with new tracking branch of WCSim
-                start_time[t][:] = [p.GetPhotonStartTime() for p in photons]
-                for i in range(3):
-                    start_position[t][:,i] = [p.GetPhotonStartPos(i)/10 for p in photons]
-                    end_position[t][:,i] = [p.GetPhotonEndPos(i)/10 for p in photons]
-                    start_dir[t][:,i] = [p.GetPhotonStartDir(i) for p in photons]
-                    end_dir[t][:,i] = [p.GetPhotonEndDir(i) for p in photons]
-            except AttributeError: # leave as zeros if not using tracking branch
-                pass
+            for it in range(photons.GetEntries()):
+                p = photons[it]
+                end_time[t][it] = p.GetTruetime()
+                track[t][it] = p.GetParentID()
+                try:  # Only works with new tracking branch of WCSim
+                    start_time[t][it] = p.GetPhotonStartTime()
+                    for i in range(3):
+                        start_position[t][it,i] = p.GetPhotonStartPos(i)/10
+                        end_position[t][it,i] = p.GetPhotonEndPos(i)/10
+                        start_dir[t][it,i] = p.GetPhotonStartDir(i)
+                        end_dir[t][it,i] = p.GetPhotonEndDir(i)
+                except AttributeError: # leave as zeros if not using tracking branch
+                    pass
         photons = {
             "start_position": np.concatenate(start_position),
             "end_position": np.concatenate(end_position),
