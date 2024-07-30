@@ -189,7 +189,7 @@ class WCSim:
             start_dir.append(np.zeros((n_photons, 3), dtype=np.float32))
             end_dir.append(np.zeros((n_photons, 3), dtype=np.float32))
             photons = self.trigger.GetCherenkovHitTimes()
-            for it in range(photons.GetEntries()):
+            for it in range(n_photons):
                 p = photons[it]
                 end_time[t][it] = p.GetTruetime()
                 track[t][it] = p.GetParentID()
