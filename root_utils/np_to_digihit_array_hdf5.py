@@ -25,13 +25,13 @@ if __name__ == '__main__':
     f = h5py.File(config.output_file, 'w')
 
     script_path = os.path.dirname(os.path.abspath(__file__))
-    git_status = subprocess.check_output(['git', '-C', script_path, 'status', '--porcelain', '--untracked-files=no']).decode()
+    git_status = subprocess.check_output(['git', '--no-optional-locks', '-C', script_path, 'status', '--porcelain', '--untracked-files=no']).decode()
     if git_status:
         warnings.warn("Directory of this script ({}) is not a clean git directory:\n{}Need a clean git directory for storing script version in output file.".format(script_path, git_status))
-    git_describe = subprocess.check_output(['git', '-C', script_path, 'describe', '--always', '--long', '--tags', '--dirty']).decode().strip()
+    git_describe = subprocess.check_output(['git', '--no-optional-locks', '-C', script_path, 'describe', '--always', '--long', '--tags', '--dirty']).decode().strip()
     print("git describe for path to this script ({}):".format(script_path), git_describe)
     f.attrs['git-describe'] = git_describe
-    f.attrs['command'] = str(sys.argv)
+    f.attrs['command'] = " ".join(sys.argv)
     f.attrs['timestamp'] = str(datetime.now())
 
     total_rows = 0
