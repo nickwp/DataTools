@@ -57,7 +57,7 @@ def dump_file(infile, outfile):
     track_stop_position = np.empty(nevents, dtype=object)
     track_parent = np.empty(nevents, dtype=object)
     track_flag = np.empty(nevents, dtype=object)
-    track_boundary_points = np.empty(nevents, dtype=object)
+#    track_boundary_points = np.empty(nevents, dtype=object)
     track_boundary_times = np.empty(nevents, dtype=object)
     track_boundary_kes = np.empty(nevents, dtype=object)
     track_boundary_types = np.empty(nevents, dtype=object)
@@ -97,7 +97,7 @@ def dump_file(infile, outfile):
         track_stop_position[ev] = tracks["stop_position"]
         track_parent[ev] = tracks["parent"]
         track_flag[ev] = tracks["flag"]
-        track_boundary_points[ev] = tracks["boundary_points"]
+#        track_boundary_points[ev] = tracks["boundary_points"]
         track_boundary_times[ev] = tracks["boundary_times"]
         track_boundary_kes[ev] = tracks["boundary_kes"]
         track_boundary_types[ev] = tracks["boundary_types"]
@@ -136,7 +136,7 @@ def dump_file(infile, outfile):
                         track_stop_position=track_stop_position,
                         track_parent=track_parent,
                         track_flag=track_flag,
-                        track_boundary_points=track_boundary_points,
+#                        track_boundary_points=track_boundary_points,
                         track_boundary_times=track_boundary_times,
                         track_boundary_kes=track_boundary_kes,
                         track_boundary_types=track_boundary_types,
