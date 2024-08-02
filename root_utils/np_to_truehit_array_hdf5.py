@@ -38,7 +38,7 @@ if __name__ == '__main__':
         print(input_file, flush=True)
         if not os.path.isfile(input_file):
             raise ValueError(input_file+" does not exist")
-        npz_file = np.load(input_file)
+        npz_file = np.load(input_file, allow_pickle=True)
         hit_pmts = npz_file['true_hit_pmt']
         total_rows += hit_pmts.shape[0]
         for h in hit_pmts:
