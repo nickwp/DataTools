@@ -2,9 +2,6 @@ import ROOT
 import os
 import numpy as np
 
-ROOT.gSystem.Load(os.environ['WCSIM_BUILD_DIR'] + "/lib/libWCSimRoot.so")
-
-
 class WCSim:
     def __init__(self, tree):
         print("number of entries in the geometry tree: " + str(self.geotree.GetEntries()))
@@ -189,8 +186,7 @@ class WCSim:
             start_dir.append(np.zeros((n_photons, 3), dtype=np.float32))
             end_dir.append(np.zeros((n_photons, 3), dtype=np.float32))
             photons = self.trigger.GetCherenkovHitTimes()
-            for it in range(n_photons):
-                p = photons[it]
+            for it, p in enumerate(photons):
                 end_time[t][it] = p.GetTruetime()
                 track[t][it] = p.GetParentID()
                 try:  # Only works with new tracking branch of WCSim
