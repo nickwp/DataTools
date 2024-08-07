@@ -2,7 +2,8 @@ import ROOT
 import os
 import numpy as np
 
-ROOT.gSystem.Load(os.environ['WCSIMDIR'] + "/libWCSimRoot.so")
+#Uncomment the following line if using old WCSim versions
+#ROOT.gSystem.Load(os.environ['WCSIMDIR'] + "/libWCSimRoot.so")
 
 
 class WCSim:
@@ -232,6 +233,10 @@ class WCSim:
         stop_position = []
         parent = []
         flag = []
+#        boundary_points = []
+        boundary_kes = []
+        boundary_times = []
+        boundary_types = []
         for t in range(self.ntrigger):
             self.get_trigger(t)
             for track in self.trigger.GetTracks():
@@ -243,6 +248,10 @@ class WCSim:
                 stop_position.append([track.GetStop(i) for i in range(3)])
                 parent.append(track.GetParenttype())
                 flag.append(track.GetFlag())
+#                boundary_points.append(np.array([b for b in track.GetBoundaryPoints()],dtype=np.float32))
+                boundary_times.append(np.array([b for b in track.GetBoundaryTimes()],dtype=np.float32))
+                boundary_kes.append(np.array([b for b in track.GetBoundaryKEs()],dtype=np.float32))
+                boundary_types.append(np.asarray([b for b in track.GetBoundaryTypes()], dtype=np.int32))
         tracks = {
             "id": np.asarray(track_id, dtype=np.int32),
             "pid": np.asarray(pid, dtype=np.int32),
@@ -251,7 +260,11 @@ class WCSim:
             "start_position": np.asarray(start_position, dtype=np.float32),
             "stop_position": np.asarray(stop_position, dtype=np.float32),
             "parent": np.asarray(parent, dtype=np.int32),
-            "flag": np.asarray(flag, dtype=np.int32)
+            "flag": np.asarray(flag, dtype=np.int32),
+#            "boundary_points": np.asarray(boundary_points, dtype=object),
+            "boundary_times": np.asarray(boundary_times, dtype=object),
+            "boundary_kes": np.asarray(boundary_kes, dtype=object),
+            "boundary_types": np.array(boundary_types, dtype=object),
         }
         return tracks
 
