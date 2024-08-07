@@ -115,8 +115,6 @@ def dump_file(infile, outfile):
         event_id[ev] = ev
         root_file[ev] = infile
 
-        print(ev)
-
     np.savez_compressed(outfile,
                         event_id=event_id,
                         root_file=root_file,
