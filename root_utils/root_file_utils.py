@@ -5,7 +5,6 @@ import numpy as np
 #Uncomment the following line if using old WCSim versions
 #ROOT.gSystem.Load(os.environ['WCSIMDIR'] + "/libWCSimRoot.so")
 
-
 class WCSim:
     def __init__(self, tree):
         print("number of entries in the geometry tree: " + str(self.geotree.GetEntries()))
@@ -186,6 +185,8 @@ class WCSim:
     def get_hit_photons(self):
         start_position = []
         end_position = []
+        start_dir = []
+        end_dir = []
         start_time = []
         end_time = []
         track = []
@@ -203,19 +204,26 @@ class WCSim:
             start_time.append(np.zeros(n_photons, dtype=np.float32))
             start_position.append(np.zeros((n_photons, 3), dtype=np.float32))
             end_position.append(np.zeros((n_photons, 3), dtype=np.float32))
+            start_dir.append(np.zeros((n_photons, 3), dtype=np.float32))
+            end_dir.append(np.zeros((n_photons, 3), dtype=np.float32))
             photons = self.trigger.GetCherenkovHitTimes()
-            end_time[t][:] = [p.GetTruetime() for p in photons]
-            track[t][:] = [p.GetParentID() for p in photons]
-            try:  # Only works with new tracking branch of WCSim
-                start_time[t][:] = [p.GetPhotonStartTime() for p in photons]
-                for i in range(3):
-                    start_position[t][:,i] = [p.GetPhotonStartPos(i)/10 for p in photons]
-                    end_position[t][:,i] = [p.GetPhotonEndPos(i)/10 for p in photons]
-            except AttributeError: # leave as zeros if not using tracking branch
-                pass
+            for it, p in enumerate(photons):
+                end_time[t][it] = p.GetTruetime()
+                track[t][it] = p.GetParentID()
+                try:  # Only works with new tracking branch of WCSim
+                    start_time[t][it] = p.GetPhotonStartTime()
+                    for i in range(3):
+                        start_position[t][it,i] = p.GetPhotonStartPos(i)/10
+                        end_position[t][it,i] = p.GetPhotonEndPos(i)/10
+                        start_dir[t][it,i] = p.GetPhotonStartDir(i)
+                        end_dir[t][it,i] = p.GetPhotonEndDir(i)
+                except AttributeError: # leave as zeros if not using tracking branch
+                    pass
         photons = {
             "start_position": np.concatenate(start_position),
             "end_position": np.concatenate(end_position),
+            "start_dir": np.concatenate(start_dir),
+            "end_dir": np.concatenate(end_dir),
             "start_time": np.concatenate(start_time),
             "end_time": np.concatenate(end_time),
             "track": np.concatenate(track),
@@ -231,6 +239,7 @@ class WCSim:
         energy = []
         start_position = []
         stop_position = []
+        dir = []
         parent = []
         flag = []
 #        boundary_points = []
@@ -246,6 +255,7 @@ class WCSim:
                 energy.append(track.GetE())
                 start_position.append([track.GetStart(i) for i in range(3)])
                 stop_position.append([track.GetStop(i) for i in range(3)])
+                dir.append([track.GetDir(i) for i in range(3)])
                 parent.append(track.GetParenttype())
                 flag.append(track.GetFlag())
 #                boundary_points.append(np.array([b for b in track.GetBoundaryPoints()],dtype=np.float32))
@@ -259,6 +269,7 @@ class WCSim:
             "energy": np.asarray(energy, dtype=np.float32),
             "start_position": np.asarray(start_position, dtype=np.float32),
             "stop_position": np.asarray(stop_position, dtype=np.float32),
+            "dir": np.asarray(dir, dtype=np.float32),
             "parent": np.asarray(parent, dtype=np.int32),
             "flag": np.asarray(flag, dtype=np.int32),
 #            "boundary_points": np.asarray(boundary_points, dtype=object),

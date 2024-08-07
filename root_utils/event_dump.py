@@ -45,8 +45,10 @@ def dump_file(infile, outfile):
     true_hit_pmt = np.empty(nevents, dtype=object)
     true_hit_time = np.empty(nevents, dtype=object)
     true_hit_pos = np.empty(nevents, dtype=object)
+    true_hit_dir = np.empty(nevents, dtype=object)
     true_hit_start_time = np.empty(nevents, dtype=object)
     true_hit_start_pos = np.empty(nevents, dtype=object)
+    true_hit_start_dir = np.empty(nevents, dtype=object)
     true_hit_parent = np.empty(nevents, dtype=object)
 
     track_id = np.empty(nevents, dtype=object)
@@ -55,6 +57,7 @@ def dump_file(infile, outfile):
     track_energy = np.empty(nevents, dtype=object)
     track_start_position = np.empty(nevents, dtype=object)
     track_stop_position = np.empty(nevents, dtype=object)
+    track_dir = np.empty(nevents, dtype=object)
     track_parent = np.empty(nevents, dtype=object)
     track_flag = np.empty(nevents, dtype=object)
 #    track_boundary_points = np.empty(nevents, dtype=object)
@@ -78,8 +81,10 @@ def dump_file(infile, outfile):
         true_hit_pmt[ev] = true_hits["pmt"]
         true_hit_time[ev] = true_hits["end_time"]
         true_hit_pos[ev] = true_hits["end_position"]
+        true_hit_dir[ev] = true_hits["end_dir"]
         true_hit_start_time[ev] = true_hits["start_time"]
         true_hit_start_pos[ev] = true_hits["start_position"]
+        true_hit_start_dir[ev] = true_hits["start_dir"]
         true_hit_parent[ev] = true_hits["track"]
 
         digi_hits = wcsim.get_digitized_hits()
@@ -95,6 +100,7 @@ def dump_file(infile, outfile):
         track_energy[ev] = tracks["energy"]
         track_start_position[ev] = tracks["start_position"]
         track_stop_position[ev] = tracks["stop_position"]
+        track_dir[ev] = tracks["dir"]
         track_parent[ev] = tracks["parent"]
         track_flag[ev] = tracks["flag"]
 #        track_boundary_points[ev] = tracks["boundary_points"]
@@ -125,8 +131,10 @@ def dump_file(infile, outfile):
                         true_hit_pmt=true_hit_pmt,
                         true_hit_time=true_hit_time,
                         true_hit_pos=true_hit_pos,
+                        true_hit_dir=true_hit_dir,
                         true_hit_start_time=true_hit_start_time,
                         true_hit_start_pos=true_hit_start_pos,
+                        true_hit_start_dir=true_hit_start_dir,
                         true_hit_parent=true_hit_parent,
                         track_id=track_id,
                         track_pid=track_pid,
@@ -134,6 +142,7 @@ def dump_file(infile, outfile):
                         track_energy=track_energy,
                         track_start_position=track_start_position,
                         track_stop_position=track_stop_position,
+                        track_dir=track_dir,
                         track_parent=track_parent,
                         track_flag=track_flag,
 #                        track_boundary_points=track_boundary_points,
