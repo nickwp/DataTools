@@ -24,11 +24,12 @@ class WCSim:
 
     def get_event(self, ev):
         # Delete previous triggers to prevent memory leak (only if file does not change)
-        triggers = [self.event.GetTrigger(i) for i in range(self.ntrigger)]
-        oldfile = self.tree.GetCurrentFile()
+        # triggers = [self.event.GetTrigger(i) for i in range(self.ntrigger)]
+        # oldfile = self.tree.GetCurrentFile()
+        self.event.ReInitialize() # since v1.12.20
         self.tree.GetEvent(ev)
-        if self.tree.GetCurrentFile() == oldfile:
-            [t.Delete() for t in triggers]
+        # if self.tree.GetCurrentFile() == oldfile:
+        #     [t.Delete() for t in triggers]
         self.current_event = ev
         self.event = self.tree.wcsimrootevent
         self.ntrigger = self.event.GetNumberOfEvents()
