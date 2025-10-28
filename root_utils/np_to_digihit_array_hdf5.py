@@ -168,7 +168,7 @@ if __name__ == '__main__':
             above_threshold = muons_above_threshold | electrons_above_threshold | gammas_above_threshold
             dset_veto2[offset+i] = np.any(above_threshold & outside_tank)
             # Since WCSim v1.12.14, boundary type kBlackSheet=1, kMPMT=2, kTyvek=3, kCave=4
-            muons_exit_above_threshold = [np.any((t >= 1) & (k > 166)) for t, k in zip(types[muon_tracks], kes[muon_tracks])]
+            muons_exit_above_threshold = [np.any((t >= 1) & (k > 55)) for t, k in zip(types[muon_tracks], kes[muon_tracks])]
             electrons_exit_above_threshold = [np.any((t >= 1) & (k > 2)) for t, k in zip(types[electron_tracks], kes[electron_tracks])]
             gammas_exit_above_threshold = [np.any((t >= 1) & (k > 2)) for t, k in zip(types[gamma_tracks], kes[gamma_tracks])]
             dset_fully_contained[offset+i] = not (np.any(muons_exit_above_threshold) or np.any(electrons_exit_above_threshold) or np.any(gammas_exit_above_threshold))
