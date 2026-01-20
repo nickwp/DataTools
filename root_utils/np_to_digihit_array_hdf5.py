@@ -14,7 +14,7 @@ def get_args():
     parser.add_argument('-o', '--output_file', type=str)
     parser.add_argument('-H', '--half-height', type=float, default=300)
     parser.add_argument('-R', '--radius', type=float, default=400)
-    parser.add_argument('-m', '--max-hit-time', type=float, default=100)
+    parser.add_argument('-m', '--max-hit-time', type=float, default=1000000)
     args = parser.parse_args()
     return args
 
